@@ -104,22 +104,23 @@
                 <button onclick="labNotebook.closeTableEditor()" class="text-3xl text-gray-500 hover:text-gray-700 transition-colors">×</button>
             </div>
             
-            <div class="flex flex-wrap gap-2 mb-5">
+            <div class="grid grid-cols-3 gap-2 mb-5">
                 <button onclick="labNotebook.addTableRow()" 
-                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                    ➕ Add Row
-                </button>
-                <button onclick="labNotebook.addTableColumn()"
-                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                    ➕ Add Column
+                    class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                     + Add Row
                 </button>
                 <button onclick="labNotebook.removeTableRow()"
-                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                    ➖ Remove Row
+                    class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    - Remove Row
                 </button>
+                <button onclick="labNotebook.addTableColumn()"
+                    class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    + Add Column
+                </button>
+                
                 <button onclick="labNotebook.removeTableColumn()"
-                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                    ➖ Remove Column
+                    class="col-start-3 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    - Remove Column
                 </button>
             </div>
             
@@ -127,7 +128,11 @@
                 <!-- Table will be rendered here -->
             </div>
             
-            <div class="flex gap-3 justify-end">
+            <div class="flex gap-2 justify-end">
+                 <button onclick="labNotebook.insertEditedTable()"
+                    class="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg font-medium transition-colors">
+                    <span id="tableActionText">Insert Table</span>
+                </button>
                 <button onclick="labNotebook.exportTableTemplate()"
                     class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg font-medium transition-colors">
                     Export Template
@@ -136,15 +141,12 @@
                     class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg font-medium transition-colors">
                     Cancel
                 </button>
-                <button onclick="labNotebook.insertEditedTable()"
-                    class="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg font-medium transition-colors">
-                    <span id="tableActionText">Insert Table</span>
-                </button>
+               
             </div>
         </div>
     </div>
 
-    <div class="fixed bottom-5 right-5 bg-gray-800/50 text-white px-4 py-2 rounded-lg text-sm backdrop-blur-sm">
+    <div class="fixed bottom-5 right-5 bg-gray-800/20 text-white px-4 py-2 rounded-lg text-sm ">
         Press Ctrl+Enter to save entry
     </div>
 
@@ -850,14 +852,14 @@
                 this.saveData();
             }
 
-            generateExperimentNumber() {
-                const date = new Date();
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const day = String(date.getDate()).padStart(2, '0');
-                const time = String(date.getHours()).padStart(2, '0') + String(date.getMinutes()).padStart(2, '0');
-                return `EXP-${year}${month}${day}-${time}`;
-            }
+            //generateExperimentNumber() {
+            //    const date = new Date();
+            //    const year = date.getFullYear();
+            //    const month = String(date.getMonth() + 1).padStart(2, '0');
+            //    const day = String(date.getDate()).padStart(2, '0');
+            //    const time = String(date.getHours()).padStart(2, '0') + String(date.getMinutes()).padStart(2, '0');
+            //    return `EXP-${year}${month}${day}-${time}`;
+            //}
 
             async importExperiment(event) {
                 const file = event.target.files[0];
@@ -1383,28 +1385,7 @@
                     setTimeout(() => indicator.remove(), 500);
                 }, 2000);
             }
-            //saveData() {
-              //  const data = {
-                //    experimentTitle: document.getElementById('experimentTitle').value,
-                //    experimentNumber: document.getElementById('experimentNumber').value,
-                //    experimentAuthor: document.getElementById('experimentAuthor').value,
-                //    entries: this.entries
-               // };
-                // In a real application, you would save to localStorage or a file
-                // localStorage.setItem('labNotebook', JSON.stringify(data));
-            //}
-
-           // loadData() {
-                // In a real application, you would load from localStorage or a file
-                // const data = localStorage.getItem('labNotebook');
-                // if (data) {
-                //     const parsed = JSON.parse(data);
-                //     document.getElementById('experimentTitle').value = parsed.experimentTitle || 'Untitled Experiment';
-                //     document.getElementById('experimentNumber').value = parsed.experimentNumber || 'EXP-001';
-                //     document.getElementById('experimentAuthor').value = parsed.experimentAuthor || '';
-                //     this.entries = parsed.entries || [];
-                // }
-            //}
+           
         }
 
         // Initialize the application
