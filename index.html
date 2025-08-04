@@ -1317,19 +1317,84 @@
                 link.click();
                 URL.revokeObjectURL(url);
             }
-
             saveData() {
-                const data = {
-                    experimentTitle: document.getElementById('experimentTitle').value,
-                    experimentNumber: document.getElementById('experimentNumber').value,
-                    experimentAuthor: document.getElementById('experimentAuthor').value,
-                    entries: this.entries
-                };
-                // In a real application, you would save to localStorage or a file
-                // localStorage.setItem('labNotebook', JSON.stringify(data));
+                try {
+                    const data = {
+                        experimentTitle: document.getElementById('experimentTitle').value,
+                        experimentNumber: document.getElementById('experimentNumber').value,
+                        experimentAuthor: document.getElementById('experimentAuthor').value,
+                        entries: this.entries,
+                        lastSaved: new Date().toISOString()
+                    };
+                    
+                    // Save to localStorage
+                    localStorage.setItem('labNotebook', JSON.stringify(data));
+                    
+                    // Optional: Show subtle save indicator
+                    this.showSaveIndicator();
+                } catch (error) {
+                    console.error('Error saving data:', error);
+                    // Handle quota exceeded error
+                    if (error.name === 'QuotaExceededError') {
+                        alert('Storage quota exceeded. Consider exporting your data to free up space.');
+                    }
+                }
             }
 
             loadData() {
+                try {
+                    const data = localStorage.getItem('labNotebook');
+                    if (data) {
+                        const parsed = JSON.parse(data);
+                        
+                        // Load experiment metadata
+                        document.getElementById('experimentTitle').value = parsed.experimentTitle || '';
+                        document.getElementById('experimentNumber').value = parsed.experimentNumber || '';
+                        document.getElementById('experimentAuthor').value = parsed.experimentAuthor || '';
+                        
+                        // Load entries
+                        this.entries = parsed.entries || [];
+                        
+                        // Show last saved time if available
+                        if (parsed.lastSaved) {
+                            console.log('Data loaded from:', new Date(parsed.lastSaved).toLocaleString());
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error loading data:', error);
+                    // If data is corrupted, offer to clear it
+                    if (confirm('Saved data appears to be corrupted. Would you like to clear it and start fresh?')) {
+                        localStorage.removeItem('labNotebook');
+                        this.entries = [];
+                    }
+                }
+            }
+
+            showSaveIndicator() {
+                // Create a temporary save indicator
+                const indicator = document.createElement('div');
+                indicator.className = 'fixed top-5 right-5 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-500';
+                indicator.textContent = '✓ Saved';
+                document.body.appendChild(indicator);
+                
+                // Fade out and remove after 2 seconds
+                setTimeout(() => {
+                    indicator.style.opacity = '0';
+                    setTimeout(() => indicator.remove(), 500);
+                }, 2000);
+            }
+            //saveData() {
+              //  const data = {
+                //    experimentTitle: document.getElementById('experimentTitle').value,
+                //    experimentNumber: document.getElementById('experimentNumber').value,
+                //    experimentAuthor: document.getElementById('experimentAuthor').value,
+                //    entries: this.entries
+               // };
+                // In a real application, you would save to localStorage or a file
+                // localStorage.setItem('labNotebook', JSON.stringify(data));
+            //}
+
+           // loadData() {
                 // In a real application, you would load from localStorage or a file
                 // const data = localStorage.getItem('labNotebook');
                 // if (data) {
@@ -1339,7 +1404,7 @@
                 //     document.getElementById('experimentAuthor').value = parsed.experimentAuthor || '';
                 //     this.entries = parsed.entries || [];
                 // }
-            }
+            //}
         }
 
         // Initialize the application
