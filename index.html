@@ -1,7 +1,1349 @@
 <!DOCTYPE html>
-<html>
-<body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Notes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+<!--items-center justify-center min-w-[250px]-->
+<body class="bg-gray-50 sm:px-3 py-3">
+    <div class="max-w-6xl mx-auto bg-white/60 backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden">
+        <!-- Header -->
+        <div class=" px-3 py-2 text-center" style="background-color: rgb(126, 178, 71);">
+            <h1 class="text-white/80 text-4xl font-bold mb-1">LAB NOTES</h1>
+            <div class="sm:px-10 py-3 rounded-lg  grid md:grid-cols-4 gap-2 sm:grid-cols-1">
+                <input type="text" id="experimentTitle" placeholder="Experiment Title"  
+                    class=" bg-white/80 text-gray-300 px-3 py-2 rounded-lg text-base  focus:outline-none focus:ring-2 focus:ring-purple-400">
+                <input type="text" id="experimentNumber" placeholder="Experiment Number" 
+                    class=" bg-white/80 text-gray-800 px-3 py-2 rounded-lg text-base min- focus:outline-none focus:ring-2 focus:ring-purple-400">
+                <input type="text" id="experimentAuthor" placeholder="Author" 
+                    class="basis-1/4 bg-white/80 text-gray-800 px-3 py-2 rounded-lg text-base  focus:outline-none focus:ring-2 focus:ring-purple-400">
+                <label class=" bg-gray-200 text-gray-500 text-base px-3 py-2 rounded-lg transition-all hover:bg-gray-300 hover:text-gray-600: cursor-pointer">
+                    <input type="file" id="importInput" accept=".json" class="hidden">
+                    Import Experiment
+                </label>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="py-4 sm:px-0 md:px-4 lg:px-8">
+            <!-- Entry Form -->
+            <div class="bg-gray-100/80 rounded-xl p-3 lg:p-6 mb-8 border-2 border-transparent">
+                <div class="mb-30">
+                    <label for="entryContent" class="block mb-2 font-semibold text-gray-800 text-lg">Lab Note Entry:</label>
+                    <textarea id="entryContent" placeholder="Enter your lab notes here... (or drag and drop files)"
+                        class="w-full min-h-[150px] p-4 border-2 border-gray-300 rounded-lg text-base resize-y transition-all focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"></textarea>
+                    <div class="gap-2 mt-2 grid sm:grid-cols-2 md:grid-cols-5">
+                        <button id="insertTableBtn" 
+                            class="text-white/90 px-2 py-2 rounded-lg font-semibold text-sm transition-all hover:scale-105 hover:shadow-md" style="background-color: rgba(126, 178, 71);">
+                            Insert Table
+                        </button>
+                        <button id="editTableBtn" 
+                            class="text-white/90 px-2 py-2 rounded-lg font-semibold text-sm transition-all hover:scale-105 hover:shadow-md" style="background-color: rgba(14, 43, 87, 0.686);">
+                            Edit Table
+                        </button>
+                        <label class="md:col-span-1 sm:col-span-2 bg-gray-500 text-white/90 px-2 py-2 rounded-lg font-semibold text-sm text-center transition-all hover:scale-105 hover:shadow-md cursor-pointer">
+                            <input type="file" id="importTableInput" accept=".json" class="hidden">
+                            Import Table Template
+                        </label>
+                        <!--flex flex-wrap align items: stretch-->
+                        
+                            <label class="text-center text-white/90 px-4 py-2 rounded-lg cursor-pointer transition-all hover:scale-105 font-semibold inline-block" style="background-color: rgba(153, 200, 217, 0.8);">
+                                <input type="file" id="fileInput" multiple accept="*/*" class="hidden">
+                            Attach Files
+                            </label>
+                            <div id="attachedFiles" class="flex flex-wrap gap-2"></div>
+                        
+                    </div>
+                </div>
+                
+                <div class="mb-5">
+                    
+                    
+                </div>
+                <div>
+                    <label for="entryContent" class="block mb-2 font-semibold text-gray-800 text-lg">Actions:</label>
+                    <div class="grid md:grid-cols-4 gap-2 sm:grid-cols-1 gap-3 border-b border-t border-gray-300 py-3 font-medium">
+                        <button id="saveBtn" 
+                            class="text-nowrap text-white/90 px-3 py-3 rounded-lg text-sm transition-all hover:scale-105 " style="background-color: rgba(126, 178, 71);">
+                            Save Entry (Ctrl+Enter)
+                        </button>
+                        <button id="generatePdfBtn"
+                            class="text-white/90 px-3 py-3 rounded-lg text-sm  transition-all hover:scale-105 " style="background-color: rgba(209, 69, 64);">
+                            Generate PDF Report
+                        </button>
+                        <button id="exportBtn"
+                            class="text-white/90 px-3 py-3 rounded-lg text-sm  transition-all hover:scale-105 " style="background-color: rgb(235, 123, 43);">
+                            Export All Data
+                        </button>
+                        <button id="newExperimentBtn" 
+                            class="text-white/90 px-3 py-3 rounded-lg  text-sm transition-all hover:scale-105" style="background-color: rgba(54, 163, 235, 0.713);">
+                            New Experiment
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Entries Container -->
+            <div id="entriesContainer" class="space-y-5">
+                <!-- Entries will be added here dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Editor Modal -->
+    <div id="tableEditorModal" class="hidden fixed inset-0 bg-black/50 z-50 overflow-auto">
+        <div class="bg-white m-12 p-8 max-w-4xl mx-auto rounded-2xl shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">Table Editor</h3>
+                <button onclick="labNotebook.closeTableEditor()" class="text-3xl text-gray-500 hover:text-gray-700 transition-colors">×</button>
+            </div>
+            
+            <div class="flex flex-wrap gap-2 mb-5">
+                <button onclick="labNotebook.addTableRow()" 
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    ➕ Add Row
+                </button>
+                <button onclick="labNotebook.addTableColumn()"
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    ➕ Add Column
+                </button>
+                <button onclick="labNotebook.removeTableRow()"
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    ➖ Remove Row
+                </button>
+                <button onclick="labNotebook.removeTableColumn()"
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    ➖ Remove Column
+                </button>
+            </div>
+            
+            <div id="tableContainer" class="mb-5 overflow-x-auto">
+                <!-- Table will be rendered here -->
+            </div>
+            
+            <div class="flex gap-3 justify-end">
+                <button onclick="labNotebook.exportTableTemplate()"
+                    class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg font-medium transition-colors">
+                    Export Template
+                </button>
+                <button onclick="labNotebook.closeTableEditor()"
+                    class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg font-medium transition-colors">
+                    Cancel
+                </button>
+                <button onclick="labNotebook.insertEditedTable()"
+                    class="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg font-medium transition-colors">
+                    <span id="tableActionText">Insert Table</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="fixed bottom-5 right-5 bg-gray-800/50 text-white px-4 py-2 rounded-lg text-sm backdrop-blur-sm">
+        Press Ctrl+Enter to save entry
+    </div>
+
+    <script>
+        class LabNotebook {
+            constructor() {
+                this.entries = [];
+                this.currentFiles = [];
+                this.currentTable = {
+                    rows: 3,
+                    cols: 3,
+                    data: []
+                };
+                this.editingTableRef = null;
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.loadData();
+                this.renderEntries();
+            }
+
+            setupEventListeners() {
+                // Save button
+                document.getElementById('saveBtn').addEventListener('click', () => this.saveEntry());
+                
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    // Ctrl+Enter to save
+                    if (e.ctrlKey && e.key === 'Enter') {
+                        e.preventDefault();
+                        this.saveEntry();
+                    }
+                    
+                    // Bold and Italic formatting
+                    const textarea = document.getElementById('entryContent');
+                    if (document.activeElement === textarea) {
+                        // Ctrl+B for bold
+                        if (e.ctrlKey && e.key === 'b') {
+                            e.preventDefault();
+                            this.wrapSelectedText(textarea, '**', '**');
+                        }
+                        // Ctrl+I for italic
+                        if (e.ctrlKey && e.key === 'i') {
+                            e.preventDefault();
+                            this.wrapSelectedText(textarea, '*', '*');
+                        }
+                    }
+                });
+
+                // File input
+                document.getElementById('fileInput').addEventListener('change', (e) => this.handleFileSelect(e));
+                
+                // New experiment button
+                document.getElementById('newExperimentBtn').addEventListener('click', () => this.newExperiment());
+                
+                // Import experiment button
+                document.getElementById('importInput').addEventListener('change', (e) => this.importExperiment(e));
+                
+                // PDF generation
+                document.getElementById('generatePdfBtn').addEventListener('click', () => this.generatePDF());
+
+                // Export functionality
+                document.getElementById('exportBtn').addEventListener('click', () => this.exportExperiment());
+
+                // Insert table button
+                document.getElementById('insertTableBtn').addEventListener('click', () => this.openTableEditor());
+
+                // Edit table button
+                document.getElementById('editTableBtn').addEventListener('click', () => this.editExistingTable());
+
+                // Import table template button
+                document.getElementById('importTableInput').addEventListener('change', (e) => this.importTableTemplate(e));
+
+                // Auto-save experiment info
+                document.getElementById('experimentTitle').addEventListener('input', () => this.saveData());
+                document.getElementById('experimentNumber').addEventListener('input', () => this.saveData());
+                document.getElementById('experimentAuthor').addEventListener('input', () => this.saveData());
+
+                // Drag and drop functionality
+                this.setupDragAndDrop();
+
+                // Close modal when clicking outside
+                document.getElementById('tableEditorModal').addEventListener('click', (e) => {
+                    if (e.target === document.getElementById('tableEditorModal')) {
+                        this.closeTableEditor();
+                    }
+                });
+            }
+
+            wrapSelectedText(textarea, prefix, suffix) {
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const text = textarea.value;
+                const selectedText = text.substring(start, end);
+                
+                if (start !== end) {
+                    // If text is selected, wrap it
+                    const newText = text.substring(0, start) + prefix + selectedText + suffix + text.substring(end);
+                    textarea.value = newText;
+                    
+                    // Restore selection
+                    textarea.setSelectionRange(start + prefix.length, end + prefix.length);
+                } else {
+                    // If no text selected, insert markers and place cursor between them
+                    const newText = text.substring(0, start) + prefix + suffix + text.substring(start);
+                    textarea.value = newText;
+                    
+                    // Place cursor between the markers
+                    textarea.setSelectionRange(start + prefix.length, start + prefix.length);
+                }
+                
+                // Focus back on textarea
+                textarea.focus();
+            }
+
+            setupDragAndDrop() {
+                const textarea = document.getElementById('entryContent');
+                
+                textarea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    textarea.classList.add('border-green-500', 'bg-green-50');
+                });
+
+                textarea.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    textarea.classList.remove('border-green-500', 'bg-green-50');
+                });
+
+                textarea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    textarea.classList.remove('border-green-500', 'bg-green-50');
+                    
+                    const files = Array.from(e.dataTransfer.files);
+                    if (files.length > 0) {
+                        this.currentFiles = [...this.currentFiles, ...files];
+                        this.displayAttachedFiles();
+                        
+                        // Show feedback
+                        const fileNames = files.map(f => f.name).join(', ');
+                        textarea.placeholder = `Files added: ${fileNames}. Continue typing your notes...`;
+                        setTimeout(() => {
+                            textarea.placeholder = "Enter your lab notes here... (or drag and drop files)";
+                        }, 3000);
+                    }
+                });
+            }
+
+            openTableEditor(tableRef = null, tableData = null) {
+                if (tableRef && tableData) {
+                    // Editing existing table
+                    this.editingTableRef = tableRef;
+                    this.currentTable = {
+                        rows: tableData.data.length,
+                        cols: tableData.data[0] ? tableData.data[0].length : 3,
+                        data: JSON.parse(JSON.stringify(tableData.data))
+                    };
+                    document.getElementById('tableActionText').textContent = 'Update Table';
+                } else {
+                    // Creating new table
+                    this.editingTableRef = null;
+                    this.currentTable = {
+                        rows: 3,
+                        cols: 3,
+                        data: []
+                    };
+                    
+                    // Create initial empty data
+                    for (let i = 0; i < this.currentTable.rows; i++) {
+                        this.currentTable.data[i] = [];
+                        for (let j = 0; j < this.currentTable.cols; j++) {
+                            if (i === 0) {
+                                this.currentTable.data[i][j] = `Header ${j + 1}`;
+                            } else {
+                                this.currentTable.data[i][j] = '';
+                            }
+                        }
+                    }
+                    document.getElementById('tableActionText').textContent = 'Insert Table';
+                }
+                
+                this.renderTable();
+                document.getElementById('tableEditorModal').classList.remove('hidden');
+            }
+
+            editExistingTable() {
+                const textarea = document.getElementById('entryContent');
+                const cursorPos = textarea.selectionStart;
+                const text = textarea.value;
+                
+                // Find table reference at or near cursor position
+                const tableRefs = text.match(/\[TABLE_\d+\]/g) || [];
+                let foundTableRef = null;
+                let foundTableData = null;
+                
+                // First check in pending tables (unsaved)
+                for (const ref of tableRefs) {
+                    const index = text.indexOf(ref);
+                    if (index <= cursorPos && cursorPos <= index + ref.length) {
+                        foundTableRef = ref;
+                        if (this.pendingTables && this.pendingTables[ref]) {
+                            foundTableData = this.pendingTables[ref];
+                        }
+                        break;
+                    }
+                }
+                
+                // If not found in pending, check in saved entries
+                if (!foundTableData) {
+                    for (const entry of this.entries) {
+                        if (entry.tables && entry.content.includes(foundTableRef)) {
+                            if (entry.tables[foundTableRef]) {
+                                foundTableData = entry.tables[foundTableRef];
+                                // Add to pending tables for editing
+                                if (!this.pendingTables) {
+                                    this.pendingTables = {};
+                                }
+                                this.pendingTables[foundTableRef] = JSON.parse(JSON.stringify(foundTableData));
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                if (foundTableRef && foundTableData) {
+                    this.openTableEditor(foundTableRef, foundTableData);
+                } else {
+                    alert('Please place your cursor on a table reference (e.g., [TABLE_123456]) in the text area to edit it.');
+                }
+            }
+
+            closeTableEditor() {
+                document.getElementById('tableEditorModal').classList.add('hidden');
+                this.editingTableRef = null;
+            }
+
+            renderTable() {
+                const container = document.getElementById('tableContainer');
+                let html = '<table class="w-full border-collapse">';
+                
+                for (let i = 0; i < this.currentTable.rows; i++) {
+                    html += '<tr>';
+                    for (let j = 0; j < this.currentTable.cols; j++) {
+                        const cellType = i === 0 ? 'th' : 'td';
+                        const cellClass = i === 0 ? 'bg-gray-100 font-semibold' : 'bg-white';
+                        const value = this.currentTable.data[i] && this.currentTable.data[i][j] ? this.currentTable.data[i][j] : '';
+                        html += `<${cellType} class="border border-gray-300 p-2 ${cellClass}">
+                            <input type="text" value="${value}" 
+                                onchange="labNotebook.updateCell(${i}, ${j}, this.value)"
+                                class="w-full border-none outline-none bg-transparent focus:ring-2 focus:ring-blue-400 px-1" />
+                        </${cellType}>`;
+                    }
+                    html += '</tr>';
+                }
+                
+                html += '</table>';
+                container.innerHTML = html;
+            }
+
+            updateCell(row, col, value) {
+                if (!this.currentTable.data[row]) {
+                    this.currentTable.data[row] = [];
+                }
+                this.currentTable.data[row][col] = value;
+            }
+
+            addTableRow() {
+                this.currentTable.rows++;
+                if (!this.currentTable.data[this.currentTable.rows - 1]) {
+                    this.currentTable.data[this.currentTable.rows - 1] = [];
+                    for (let j = 0; j < this.currentTable.cols; j++) {
+                        this.currentTable.data[this.currentTable.rows - 1][j] = '';
+                    }
+                }
+                this.renderTable();
+            }
+
+            addTableColumn() {
+                this.currentTable.cols++;
+                for (let i = 0; i < this.currentTable.rows; i++) {
+                    if (!this.currentTable.data[i]) {
+                        this.currentTable.data[i] = [];
+                    }
+                    this.currentTable.data[i][this.currentTable.cols - 1] = i === 0 ? `Header ${this.currentTable.cols}` : '';
+                }
+                this.renderTable();
+            }
+
+            removeTableRow() {
+                if (this.currentTable.rows > 1) {
+                    this.currentTable.rows--;
+                    this.currentTable.data.pop();
+                    this.renderTable();
+                }
+            }
+
+            removeTableColumn() {
+                if (this.currentTable.cols > 1) {
+                    this.currentTable.cols--;
+                    for (let i = 0; i < this.currentTable.rows; i++) {
+                        if (this.currentTable.data[i]) {
+                            this.currentTable.data[i].pop();
+                        }
+                    }
+                    this.renderTable();
+                }
+            }
+
+            insertEditedTable() {
+                const textarea = document.getElementById('entryContent');
+                const tableData = {
+                    type: 'table',
+                    data: JSON.parse(JSON.stringify(this.currentTable.data))
+                };
+                
+                if (!this.pendingTables) {
+                    this.pendingTables = {};
+                }
+                
+                if (this.editingTableRef) {
+                    // Update existing table
+                    this.pendingTables[this.editingTableRef] = tableData;
+                } else {
+                    // Add new table
+                    const tableRef = `[TABLE_${Date.now()}]`;
+                    const cursorPos = textarea.selectionStart;
+                    const textBefore = textarea.value.substring(0, cursorPos);
+                    const textAfter = textarea.value.substring(textarea.selectionEnd);
+                    
+                    textarea.value = textBefore + '\n' + tableRef + '\n' + textAfter;
+                    this.pendingTables[tableRef] = tableData;
+                }
+                
+                this.closeTableEditor();
+                textarea.focus();
+            }
+
+            extractTableTemplates() {
+                const templates = [];
+                const seenTables = new Set();
+                
+                this.entries.forEach((entry, entryIndex) => {
+                    if (entry.tables) {
+                        Object.keys(entry.tables).forEach(tableRef => {
+                            const tableData = entry.tables[tableRef];
+                            if (tableData && tableData.data) {
+                                // Create a signature for the table structure
+                                const headers = tableData.data[0] || [];
+                                const signature = headers.join('|');
+                                
+                                if (!seenTables.has(signature)) {
+                                    seenTables.add(signature);
+                                    
+                                    // Create template with structure and sample data
+                                    const template = {
+                                        name: this.generateTableTemplateName(headers),
+                                        description: `Table template from entry ${entryIndex + 1}`,
+                                        structure: {
+                                            headers: headers,
+                                            rows: tableData.data.length - 1,
+                                            cols: headers.length
+                                        },
+                                        templateData: JSON.parse(JSON.stringify(tableData.data)),
+                                        exportDate: new Date().toISOString(),
+                                        experimentNumber: document.getElementById('experimentNumber').value,
+                                        experimentTitle: document.getElementById('experimentTitle').value
+                                    };
+                                    
+                                    templates.push(template);
+                                }
+                            }
+                        });
+                    }
+                });
+                
+                return templates;
+            }
+
+            generateTableTemplateName(headers) {
+                if (!headers || headers.length === 0) return 'generic_table';
+                
+                // Create a name based on the first few headers
+                const nameBase = headers.slice(0, 3)
+                    .map(h => h.toLowerCase().replace(/[^a-z0-9]/g, '_'))
+                    .join('_');
+                    
+                return nameBase || 'table_template';
+            }
+
+            exportTableTemplate() {
+                if (!this.currentTable.data || this.currentTable.data.length === 0) {
+                    alert('No table data to export as template.');
+                    return;
+                }
+
+                const headers = this.currentTable.data[0] || [];
+                const template = {
+                    name: this.generateTableTemplateName(headers),
+                    description: 'Table template exported from table editor',
+                    structure: {
+                        headers: headers,
+                        rows: this.currentTable.rows,
+                        cols: this.currentTable.cols
+                    },
+                    templateData: JSON.parse(JSON.stringify(this.currentTable.data)),
+                    exportDate: new Date().toISOString(),
+                    experimentNumber: document.getElementById('experimentNumber').value,
+                    experimentTitle: document.getElementById('experimentTitle').value
+                };
+
+                const dataStr = JSON.stringify(template, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${template.name}_template.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+
+                alert(`Table template "${template.name}" exported successfully!`);
+            }
+
+            async importTableTemplate(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                try {
+                    const text = await file.text();
+                    const template = JSON.parse(text);
+                    
+                    // Validate template structure
+                    if (!template.templateData || !template.structure || !template.structure.headers) {
+                        alert('Invalid table template format. Please select a valid table template file.');
+                        return;
+                    }
+
+                    // Load the template into the current table editor
+                    this.currentTable = {
+                        rows: template.templateData.length,
+                        cols: template.structure.cols,
+                        data: JSON.parse(JSON.stringify(template.templateData))
+                    };
+
+                    // Set editingTableRef to null to ensure it's treated as a new table
+                    this.editingTableRef = null;
+                    document.getElementById('tableActionText').textContent = 'Insert Table';
+                    
+                    // Show the modal
+                    document.getElementById('tableEditorModal').classList.remove('hidden');
+                    
+                    // Render the table with imported data
+                    this.renderTable();
+                    
+                    // Show success message with template info
+                    const templateInfo = template.description || 
+                        `Template from ${template.experimentTitle || 'unknown experiment'}`;
+                    
+                    const shouldClearData = confirm(`Table template imported successfully!\n\n${templateInfo}\n\nHeaders: ${template.structure.headers.join(', ')}\n\nWould you like to clear the data rows and keep only the headers? (Click OK to clear data, Cancel to keep sample data)`);
+                    
+                    if (shouldClearData) {
+                        // Clear data rows (keep headers)
+                        for (let i = 1; i < this.currentTable.data.length; i++) {
+                            for (let j = 0; j < this.currentTable.data[i].length; j++) {
+                                this.currentTable.data[i][j] = '';
+                            }
+                        }
+                        this.renderTable();
+                    }
+                    
+                } catch (error) {
+                    console.error('Error importing table template:', error);
+                    alert('Error importing table template. Please ensure it\'s a valid JSON template file.');
+                } finally {
+                    // Reset file input
+                    event.target.value = '';
+                }
+            }
+
+            handleFileSelect(event) {
+                const files = Array.from(event.target.files);
+                this.currentFiles = [...this.currentFiles, ...files];
+                this.displayAttachedFiles();
+            }
+
+            displayAttachedFiles() {
+                const container = document.getElementById('attachedFiles');
+                container.innerHTML = '';
+                
+                this.currentFiles.forEach((file, index) => {
+                    const fileTag = document.createElement('div');
+                    fileTag.className = 'bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm border border-purple-300 flex items-center gap-2';
+                    fileTag.innerHTML = `
+                        ${file.name} 
+                        <button onclick="labNotebook.removeFile(${index})" class="text-purple-500 hover:text-purple-700 font-bold">×</button>
+                    `;
+                    container.appendChild(fileTag);
+                });
+            }
+
+            removeFile(index) {
+                this.currentFiles.splice(index, 1);
+                this.displayAttachedFiles();
+            }
+
+            async saveEntry() {
+                const content = document.getElementById('entryContent').value.trim();
+                if (!content) {
+                    alert('Please enter some content before saving.');
+                    return;
+                }
+
+                const timestamp = new Date().toISOString();
+                const entry = {
+                    id: Date.now(),
+                    content: content,
+                    timestamp: timestamp,
+                    files: await this.processFiles(this.currentFiles),
+                    locked: true,
+                    editHistory: [],
+                    tables: this.pendingTables || {}
+                };
+
+                this.entries.push(entry);
+                this.clearForm();
+                this.saveData();
+                this.renderEntries();
+            }
+
+            async processFiles(files) {
+                const processedFiles = [];
+                
+                for (const file of files) {
+                    try {
+                        const fileData = {
+                            name: file.name,
+                            type: file.type,
+                            size: file.size,
+                            lastModified: file.lastModified
+                        };
+
+                        // For images, create preview
+                        if (file.type.startsWith('image/')) {
+                            fileData.isImage = true;
+                            fileData.dataUrl = await this.fileToDataUrl(file);
+                        } else {
+                            // For non-images, still store data URL for download capability
+                            fileData.dataUrl = await this.fileToDataUrl(file);
+                        }
+
+                        processedFiles.push(fileData);
+                    } catch (error) {
+                        console.error('Error processing file:', error);
+                    }
+                }
+
+                return processedFiles;
+            }
+
+            fileToDataUrl(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = e => resolve(e.target.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            clearForm() {
+                document.getElementById('entryContent').value = '';
+                document.getElementById('fileInput').value = '';
+                this.currentFiles = [];
+                this.pendingTables = {};
+                this.displayAttachedFiles();
+            }
+
+            renderEntries() {
+                const container = document.getElementById('entriesContainer');
+                container.innerHTML = '';
+
+                this.entries.slice().reverse().forEach(entry => {
+                    const entryDiv = document.createElement('div');
+                    entryDiv.className = 'bg-white rounded-xl p-6 shadow-lg border border-gray-200';
+                    if (entry.locked) {
+                        entryDiv.classList.add('border-l-4', 'border-l-blue-500');
+                    }
+                    
+                    const timestamp = new Date(entry.timestamp);
+                    const formattedTime = timestamp.toLocaleString();
+
+                    // Format content with tables
+                    const formattedContent = this.formatContent(entry.content, entry.tables);
+
+                    let filesHtml = '';
+                    if (entry.files && entry.files.length > 0) {
+                        filesHtml = `
+                            <div class="mt-4">
+                                <h4 class="text-gray-600 mb-2 text-sm font-semibold"> Attachments (${entry.files.length}):</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    ${entry.files.map(file => {
+                                        if (file.isImage && file.dataUrl) {
+                                            return `<img src="${file.dataUrl}" alt="${file.name}" class="max-w-[200px] max-h-[150px] rounded-lg shadow-md" title="${file.name}">`;
+                                        } else {
+                                            return `<div class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm">${file.name} (${this.formatFileSize(file.size)})</div>`;
+                                        }
+                                    }).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    let editHistoryHtml = '';
+                    if (entry.editHistory && entry.editHistory.length > 0) {
+                        editHistoryHtml = `
+                            <div class="mt-4 bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+                                <h4 class="text-orange-600 mb-2 font-semibold">⚠️ Edit History:</h4>
+                                ${entry.editHistory.map(edit => `
+                                    <div class="text-sm text-gray-600">
+                                        ${new Date(edit.timestamp).toLocaleString()} - ${edit.description}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    }
+
+                    entryDiv.innerHTML = `
+                        <div class="flex justify-between items-center mb-4 pb-3 border-b-2 border-gray-200">
+                            <div class="font-semibold text-blue-600"> ${formattedTime}</div>
+                            <div class="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                                ${entry.locked ? 'Locked' : 'Draft'}
+                            </div>
+                        </div>
+                        <div class="text-gray-800 leading-relaxed whitespace-pre-wrap">${formattedContent}</div>
+                        ${filesHtml}
+                        ${editHistoryHtml}
+                    `;
+
+                    container.appendChild(entryDiv);
+                });
+            }
+
+            formatContent(content, tables = {}) {
+                let formattedContent = content;
+                
+                // Replace table references with actual tables
+                Object.keys(tables).forEach(tableRef => {
+                    const tableData = tables[tableRef];
+                    if (tableData && tableData.data) {
+                        let tableHtml = '<table class="w-full border-collapse my-4">';
+                        
+                        tableData.data.forEach((row, rowIndex) => {
+                            tableHtml += '<tr>';
+                            row.forEach((cell, colIndex) => {
+                                const cellType = rowIndex === 0 ? 'th' : 'td';
+                                const cellClass = rowIndex === 0 ? 'bg-gray-100 font-semibold' : '';
+                                tableHtml += `<${cellType} class="border border-gray-300 px-3 py-2 text-left ${cellClass}">${cell || ''}</${cellType}>`;
+                            });
+                            tableHtml += '</tr>';
+                        });
+                        
+                        tableHtml += '</table>';
+                        formattedContent = formattedContent.replace(tableRef, tableHtml);
+                    }
+                });
+                
+                // Process markdown-style formatting
+                // Bold: **text** or __text__
+                formattedContent = formattedContent.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+                formattedContent = formattedContent.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+                
+                // Italic: *text* or _text_ (but not if it's part of bold)
+                formattedContent = formattedContent.replace(/(?<!\*)\*(?!\*)([^*]+)(?<!\*)\*(?!\*)/g, '<em>$1</em>');
+                formattedContent = formattedContent.replace(/(?<!_)_(?!_)([^_]+)(?<!_)_(?!_)/g, '<em>$1</em>');
+                
+                // Replace newlines with <br>
+                formattedContent = formattedContent.replace(/\n/g, '<br>');
+                
+                return formattedContent;
+            }
+
+            formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            newExperiment() {
+                if (this.entries.length > 0) {
+                    if (!confirm('Are you sure you want to start a new experiment? All current entries will be cleared.')) {
+                        return;
+                    }
+                }
+                
+                this.entries = [];
+                this.clearForm();
+                document.getElementById('experimentTitle').value = '';
+                document.getElementById('experimentNumber').value = '';
+                document.getElementById('experimentAuthor').value = '';
+                this.renderEntries();
+                this.saveData();
+            }
+
+            generateExperimentNumber() {
+                const date = new Date();
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const time = String(date.getHours()).padStart(2, '0') + String(date.getMinutes()).padStart(2, '0');
+                return `EXP-${year}${month}${day}-${time}`;
+            }
+
+            async importExperiment(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                try {
+                    const text = await file.text();
+                    const data = JSON.parse(text);
+                    
+                    // Validate the imported data
+                    if (!data.experimentTitle || !data.experimentNumber || !data.entries) {
+                        alert('Invalid experiment file format. Please select a valid JSON export file.');
+                        return;
+                    }
+
+                    // Check if current experiment has unsaved data
+                    if (this.entries.length > 0) {
+                        if (!confirm('Loading a new experiment will replace the current one. Continue?')) {
+                            event.target.value = ''; // Reset file input
+                            return;
+                        }
+                    }
+
+                    // Load the experiment data
+                    document.getElementById('experimentTitle').value = data.experimentTitle;
+                    document.getElementById('experimentNumber').value = data.experimentNumber;
+                    document.getElementById('experimentAuthor').value = data.experimentAuthor || '';
+                    this.entries = data.entries || [];
+                    
+                    // Clear current form
+                    this.clearForm();
+                    
+                    // Render the loaded entries
+                    this.renderEntries();
+                    
+                    // Save to storage
+                    this.saveData();
+                    
+                    alert(`Successfully imported experiment: ${data.experimentTitle} (${data.experimentNumber})`);
+                    
+                } catch (error) {
+                    console.error('Error importing experiment:', error);
+                    alert('Error importing experiment file. Please ensure it\'s a valid JSON file exported from this application.');
+                } finally {
+                    // Reset file input
+                    event.target.value = '';
+                }
+            }
+
+            async exportExperiment() {
+                if (this.entries.length === 0) {
+                    alert('No entries to export.');
+                    return;
+                }
+
+                const title = document.getElementById('experimentTitle').value;
+                const expNumber = document.getElementById('experimentNumber').value;
+                const author = document.getElementById('experimentAuthor').value;
+                
+                // Create a new ZIP file
+                const zip = new JSZip();
+                
+                // Create export data
+                const exportData = {
+                    experimentTitle: title,
+                    experimentNumber: expNumber,
+                    experimentAuthor: author,
+                    exportDate: new Date().toISOString(),
+                    entries: this.entries
+                };
+                
+                // Add JSON data file
+                zip.file(`${expNumber}_data.json`, JSON.stringify(exportData, null, 2));
+                
+                // Generate and add PDF
+                const pdfBlob = this.generatePDFBlob();
+                zip.file(`${expNumber}_report.pdf`, pdfBlob);
+                
+                // Add attached files with experiment number in folder and filenames
+                let fileCount = 0;
+                for (const entry of this.entries) {
+                    if (entry.files && entry.files.length > 0) {
+                        for (const file of entry.files) {
+                            if (file.dataUrl) {
+                                fileCount++;
+                                // Convert data URL to blob
+                                const response = await fetch(file.dataUrl);
+                                const blob = await response.blob();
+                                // Add to ZIP with experiment number in path and filename
+                                zip.file(`${expNumber}-files/${expNumber}_${file.name}`, blob);
+                            }
+                        }
+                    }
+                }
+
+                // Export table templates
+                const tableTemplates = this.extractTableTemplates();
+                if (tableTemplates.length > 0) {
+                    const templatesFolder = zip.folder(`${expNumber}-table-templates`);
+                    tableTemplates.forEach((template, index) => {
+                        const templateName = template.name || `table_${index + 1}`;
+                        templatesFolder.file(`${expNumber}_${templateName}.json`, JSON.stringify(template, null, 2));
+                    });
+                }
+                
+                // Generate the ZIP file
+                const zipBlob = await zip.generateAsync({ type: 'blob' });
+                
+                // Save the ZIP file
+                saveAs(zipBlob, `${expNumber}_export.zip`);
+                
+                alert(`Export complete! All data has been saved to ${expNumber}_export.zip`);
+            }
+
+            generatePDFBlob() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                const title = document.getElementById('experimentTitle').value;
+                const expNumber = document.getElementById('experimentNumber').value;
+                const author = document.getElementById('experimentAuthor').value;
+                
+                // Track total pages for page numbering
+                let totalPages = 1;
+                let currentPage = 1;
+                
+                // Function to add header to each page
+                const addPageHeader = (pageNum) => {
+                    doc.setFontSize(16);
+                    doc.setFont(undefined, 'bold');
+                    doc.text(title, 20, 20);
+                    
+                    // Page numbering in top right
+                    doc.setFontSize(9);
+                    doc.setFont(undefined, 'normal');
+                    const pageText = `${pageNum} of ${totalPages}`;
+                    const pageTextWidth = doc.getTextWidth(pageText);
+                    doc.text(pageText, 190 - pageTextWidth, 20);
+                    
+                    doc.setFontSize(9);
+                    doc.text(`Experiment: ${expNumber}`, 20, 26);
+                    doc.text(`Author: ${author}`, 20, 30);
+                    doc.text('Organization: Nanologica AB', 20, 34);
+                    
+                    doc.setFontSize(9);
+                    doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 38);
+                    
+                    // Thin line separator
+                    doc.setLineWidth(0.5);
+                    doc.line(18, 40, 192, 40);
+
+                    // Thin line separator bottom
+                    doc.setLineWidth(0.2);
+                    doc.line(18, 285, 192, 285);
+                    
+                    // Add confidential footer
+                    doc.setFontSize(9);
+                    doc.setFont(undefined, 'normal');
+                    const confidentialText = 'CONFIDENTIAL - NOT TO BE DISCLOSED TO UNAUTHORISED PERSONNEL';
+                    const textWidth = doc.getTextWidth(confidentialText);
+                    const xPos = (210 - textWidth) / 2; // Center the text
+                    doc.text(confidentialText, xPos, 290);
+                };
+                
+                // First, calculate total pages needed
+                let tempY = 46;
+                this.entries.forEach((entry) => {
+                    // Estimate space needed for this entry
+                    const contentLines = doc.splitTextToSize(entry.content, 170);
+                    let entryHeight = contentLines.length * 4 + 20;
+                    
+                    // Add height for tables
+                    const tableMatches = entry.content.match(/\[TABLE_\d+\]/g);
+                    if (tableMatches && entry.tables) {
+                        tableMatches.forEach(tableRef => {
+                            const tableData = entry.tables[tableRef];
+                            if (tableData && tableData.data) {
+                                entryHeight += (tableData.data.length + 2) * 10;
+                            }
+                        });
+                    }
+                    
+                    // Add height for images
+                    const images = entry.files ? entry.files.filter(f => f.isImage && f.dataUrl) : [];
+                    if (images.length > 0) {
+                        const imageRows = Math.ceil(images.length / 3);
+                        entryHeight += imageRows * 40;
+                    }
+                    
+                    // Add height for non-image files
+                    const nonImageFiles = entry.files ? entry.files.filter(f => !f.isImage) : [];
+                    if (nonImageFiles.length > 0) {
+                        entryHeight += 10;
+                    }
+                    
+                    // Check if new page is needed
+                    if (tempY + entryHeight > 270) {
+                        totalPages++;
+                        tempY = 46;
+                    }
+                    tempY += entryHeight;
+                });
+                
+                // Now generate the actual PDF with correct page numbers
+                addPageHeader(currentPage);
+                let yPosition = 46;
+                
+                this.entries.forEach((entry, index) => {
+                    // Process content in chunks to handle page breaks properly
+                    const renderEntry = () => {
+                        // Timestamp
+                        doc.setFontSize(9);
+                        doc.setFont(undefined, 'bold');
+                        doc.setTextColor(60, 60, 60);
+                        const timestamp = new Date(entry.timestamp).toLocaleString();
+                        doc.text(timestamp, 20, yPosition);
+                        yPosition += 8;
+                        
+                        // Reset text properties for content
+                        doc.setFontSize(10);
+                        doc.setFont(undefined, 'normal');
+                        doc.setTextColor(0, 0, 0);
+                        
+                        // Process content and tables
+                        let contentParts = entry.content.split(/(\[TABLE_\d+\])/);
+                        
+                        for (let i = 0; i < contentParts.length; i++) {
+                            const part = contentParts[i];
+                            
+                            if (part.match(/\[TABLE_\d+\]/)) {
+                                // Render table
+                                const tableData = entry.tables[part];
+                                if (tableData && tableData.data) {
+                                    // Check if table fits on current page
+                                    const tableHeight = (tableData.data.length + 2) * 10;
+                                    if (yPosition + tableHeight > 270) {
+                                        doc.addPage();
+                                        currentPage++;
+                                        addPageHeader(currentPage);
+                                        yPosition = 46;
+                                    }
+                                    
+                                    const headers = tableData.data[0] || [];
+                                    const rows = tableData.data.slice(1) || [];
+                                    
+                                    doc.autoTable({
+                                        head: [headers],
+                                        body: rows,
+                                        startY: yPosition,
+                                        margin: { left: 20 },
+                                        styles: { fontSize: 9, cellPadding: 2 },
+                                        headStyles: { fillColor: [248, 249, 250], textColor: [0, 0, 0], fontStyle: 'bold' },
+                                        alternateRowStyles: { fillColor: [252, 252, 252] },
+                                        didDrawPage: function(data) {
+                                            // If table spans multiple pages, add headers to new pages
+                                            if (data.pageNumber > currentPage) {
+                                                currentPage = data.pageNumber;
+                                                addPageHeader(currentPage);
+                                            }
+                                        }
+                                    });
+                                    
+                                    yPosition = doc.lastAutoTable.finalY + 5;
+                                }
+                            } else if (part.trim()) {
+                                // Process text with markdown formatting
+                                let processedText = part.trim();
+                                
+                                // Process bold and italic markers for PDF
+                                // Remove markdown markers and apply formatting
+                                const lines = doc.splitTextToSize(processedText, 170);
+                                
+                                for (let j = 0; j < lines.length; j++) {
+                                    if (yPosition > 270) {
+                                        doc.addPage();
+                                        currentPage++;
+                                        addPageHeader(currentPage);
+                                        yPosition = 46;
+                                    }
+                                    
+                                    let line = lines[j];
+                                    
+                                    // Simple approach: detect and apply formatting
+                                    if (line.includes('**') || line.includes('*')) {
+                                        // Split line into segments with formatting
+                                        let segments = [];
+                                        let currentSegment = '';
+                                        let isBold = false;
+                                        let isItalic = false;
+                                        
+                                        // Process line character by character
+                                        for (let k = 0; k < line.length; k++) {
+                                            if (line.substr(k, 2) === '**') {
+                                                if (currentSegment) {
+                                                    segments.push({text: currentSegment, bold: isBold, italic: isItalic});
+                                                    currentSegment = '';
+                                                }
+                                                isBold = !isBold;
+                                                k++; // Skip next character
+                                            } else if (line[k] === '*' && line[k-1] !== '*' && line[k+1] !== '*') {
+                                                if (currentSegment) {
+                                                    segments.push({text: currentSegment, bold: isBold, italic: isItalic});
+                                                    currentSegment = '';
+                                                }
+                                                isItalic = !isItalic;
+                                            } else {
+                                                currentSegment += line[k];
+                                            }
+                                        }
+                                        
+                                        if (currentSegment) {
+                                            segments.push({text: currentSegment, bold: isBold, italic: isItalic});
+                                        }
+                                        
+                                        // Render segments with appropriate formatting
+                                        let xPos = 20;
+                                        segments.forEach(segment => {
+                                            if (segment.bold && segment.italic) {
+                                                doc.setFont(undefined, 'bolditalic');
+                                            } else if (segment.bold) {
+                                                doc.setFont(undefined, 'bold');
+                                            } else if (segment.italic) {
+                                                doc.setFont(undefined, 'italic');
+                                            } else {
+                                                doc.setFont(undefined, 'normal');
+                                            }
+                                            doc.text(segment.text, xPos, yPosition);
+                                            xPos += doc.getTextWidth(segment.text);
+                                        });
+                                        doc.setFont(undefined, 'normal');
+                                    } else {
+                                        doc.text(line, 20, yPosition);
+                                    }
+                                    yPosition += 4;
+                                }
+                                yPosition += 5;
+                            }
+                        }
+                        
+                        // Handle images
+                        const images = entry.files ? entry.files.filter(f => f.isImage && f.dataUrl) : [];
+                        if (images.length > 0) {
+                            const imageWidth = 50;
+                            const imageHeight = 35;
+                            const imageSpacing = 5;
+                            
+                            let currentRow = 0;
+                            let currentCol = 0;
+                            
+                            for (let i = 0; i < images.length; i++) {
+                                const image = images[i];
+                                
+                                // Check if images fit on current page
+                                if (yPosition + imageHeight + 10 > 270) {
+                                    doc.addPage();
+                                    currentPage++;
+                                    addPageHeader(currentPage);
+                                    yPosition = 46;
+                                    currentRow = 0;
+                                    currentCol = 0;
+                                }
+                                
+                                try {
+                                    const xPos = 20 + currentCol * (imageWidth + imageSpacing);
+                                    const yPos = yPosition + currentRow * (imageHeight + imageSpacing);
+                                    
+                                    doc.addImage(image.dataUrl, 'JPEG', xPos, yPos, imageWidth, imageHeight);
+                                    
+                                    // Add filename below image
+                                    doc.setFontSize(7);
+                                    doc.setTextColor(80, 80, 80);
+                                    const truncatedName = image.name.length > 15 ? 
+                                        image.name.substring(0, 12) + '...' : image.name;
+                                    doc.text(truncatedName, xPos, yPos + imageHeight + 3);
+                                    
+                                    currentCol++;
+                                    if (currentCol >= 3) {
+                                        currentCol = 0;
+                                        currentRow++;
+                                    }
+                                } catch (error) {
+                                    console.error('Error adding image to PDF:', error);
+                                }
+                            }
+                            
+                            const totalRows = Math.ceil(images.length / 3);
+                            yPosition += totalRows * (imageHeight + imageSpacing) + 5;
+                        }
+                        
+                        // Non-image attachments
+                        const nonImageFiles = entry.files ? entry.files.filter(f => !f.isImage) : [];
+                        if (nonImageFiles.length > 0) {
+                            if (yPosition + 10 > 270) {
+                                doc.addPage();
+                                currentPage++;
+                                addPageHeader(currentPage);
+                                yPosition = 46;
+                            }
+                            
+                            doc.setFontSize(8);
+                            doc.setTextColor(80, 80, 80);
+                            const fileNames = nonImageFiles.map(f => f.name).join(', ');
+                            const attachmentText = `file: ${fileNames}`;
+                            const attachmentLines = doc.splitTextToSize(attachmentText, 170);
+                            doc.text(attachmentLines, 20, yPosition);
+                            yPosition += attachmentLines.length * 3 + 2;
+                        }
+                        
+                        // Edit history
+                        if (entry.editHistory && entry.editHistory.length > 0) {
+                            if (yPosition + 5 > 270) {
+                                doc.addPage();
+                                currentPage++;
+                                addPageHeader(currentPage);
+                                yPosition = 46;
+                            }
+                            
+                            doc.setFontSize(8);
+                            doc.setTextColor(150, 100, 0);
+                            doc.text('⚠️ Modified after saving', 20, yPosition);
+                            yPosition += 4;
+                        }
+                        
+                        yPosition += 10;
+                    };
+                    
+                    renderEntry();
+                });
+                
+                // Update total pages in all page headers
+                const pageCount = doc.internal.getNumberOfPages();
+                for (let i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    // Cover up old page number
+                    doc.setFillColor(255, 255, 255);
+                    doc.rect(150, 15, 50, 10, 'F');
+                    // Add correct page number
+                    doc.setFontSize(9);
+                    doc.setFont(undefined, 'normal');
+                    doc.setTextColor(0, 0, 0);
+                    const pageText = `${i} of ${pageCount}`;
+                    const pageTextWidth = doc.getTextWidth(pageText);
+                    doc.text(pageText, 190 - pageTextWidth, 20);
+                }
+                
+                return doc.output('blob');
+            }
+
+            generatePDF() {
+                const blob = this.generatePDFBlob();
+                const expNumber = document.getElementById('experimentNumber').value;
+                
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${expNumber}_lab_notes.pdf`;
+                link.click();
+                URL.revokeObjectURL(url);
+            }
+
+            saveData() {
+                const data = {
+                    experimentTitle: document.getElementById('experimentTitle').value,
+                    experimentNumber: document.getElementById('experimentNumber').value,
+                    experimentAuthor: document.getElementById('experimentAuthor').value,
+                    entries: this.entries
+                };
+                // In a real application, you would save to localStorage or a file
+                // localStorage.setItem('labNotebook', JSON.stringify(data));
+            }
+
+            loadData() {
+                // In a real application, you would load from localStorage or a file
+                // const data = localStorage.getItem('labNotebook');
+                // if (data) {
+                //     const parsed = JSON.parse(data);
+                //     document.getElementById('experimentTitle').value = parsed.experimentTitle || 'Untitled Experiment';
+                //     document.getElementById('experimentNumber').value = parsed.experimentNumber || 'EXP-001';
+                //     document.getElementById('experimentAuthor').value = parsed.experimentAuthor || '';
+                //     this.entries = parsed.entries || [];
+                // }
+            }
+        }
+
+        // Initialize the application
+        const labNotebook = new LabNotebook();
+    </script>
 </body>
 </html>
