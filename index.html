@@ -23,7 +23,7 @@
                     class=" bg-white/80 text-gray-800 px-3 py-2 rounded-lg text-base min- focus:outline-none focus:ring-2 focus:ring-purple-400">
                 <input type="text" id="experimentAuthor" placeholder="Author" 
                     class="basis-1/4 bg-white/80 text-gray-800 px-3 py-2 rounded-lg text-base  focus:outline-none focus:ring-2 focus:ring-purple-400">
-                <label class=" bg-gray-200 text-gray-500 text-base px-3 py-2 rounded-lg transition-all hover:bg-gray-300 hover:text-gray-600: cursor-pointer">
+                <label class=" bg-gray-200 text-gray-500 text-base text-nowrap px-3 py-2 rounded-lg transition-all hover:bg-gray-300 hover:text-gray-600: cursor-pointer">
                     <input type="file" id="importInput" accept=".json" class="hidden">
                     Import Experiment
                 </label>
@@ -47,7 +47,7 @@
                             class="text-white/90 px-2 py-2 rounded-lg font-semibold text-sm transition-all hover:scale-105 hover:shadow-md" style="background-color: rgba(14, 43, 87, 0.686);">
                             Edit Table
                         </button>
-                        <label class="md:col-span-1 sm:col-span-2 bg-gray-500 text-white/90 px-2 py-2 rounded-lg font-semibold text-sm text-center transition-all hover:scale-105 hover:shadow-md cursor-pointer">
+                        <label class="md:col-span-1 sm:col-span-2 bg-gray-500 text-white/90 text-nowrap px-2 py-2 rounded-lg font-semibold text-sm text-center transition-all hover:scale-105 hover:shadow-md cursor-pointer">
                             <input type="file" id="importTableInput" accept=".json" class="hidden">
                             Import Table Template
                         </label>
@@ -68,9 +68,9 @@
                 </div>
                 <div>
                     <label for="entryContent" class="block mb-2 font-semibold text-gray-800 text-lg">Actions:</label>
-                    <div class="grid md:grid-cols-4 gap-2 sm:grid-cols-1 gap-3 border-b border-t border-gray-300 py-3 font-medium">
+                    <div class="grid md:grid-cols-4 gap-2 sm:grid-cols-2 grid-cols-1 gap-3 border-b border-t border-gray-300 py-3 font-medium">
                         <button id="saveBtn" 
-                            class="text-nowrap text-white/90 px-3 py-3 rounded-lg text-sm transition-all hover:scale-105 " style="background-color: rgba(126, 178, 71);">
+                            class="text-nowrap text-white/90 px-3 py-3 sm:col-span-2 md:col-span-1 rounded-lg text-sm transition-all hover:scale-105 " style="background-color: rgba(126, 178, 71);">
                             Save Entry (Ctrl+Enter)
                         </button>
                         <button id="generatePdfBtn"
@@ -82,7 +82,7 @@
                             Export All Data
                         </button>
                         <button id="newExperimentBtn" 
-                            class="text-white/90 px-3 py-3 rounded-lg  text-sm transition-all hover:scale-105" style="background-color: rgba(54, 163, 235, 0.713);">
+                            class="text-white/90 px-3 py-3 rounded-lg sm:col-span-2 md:col-span-1 text-sm transition-all hover:scale-105" style="background-color: rgba(54, 163, 235, 0.713);">
                             New Experiment
                         </button>
                     </div>
@@ -146,7 +146,7 @@
         </div>
     </div>
 
-    <div class="fixed bottom-5 right-5 bg-gray-800/20 text-white px-4 py-2 rounded-lg text-sm ">
+    <div class=" invisible sm:visible fixed bottom-5 right-5 bg-gray-800/20 text-white px-4 py-2 rounded-lg text-sm ">
         Press Ctrl+Enter to save entry
     </div>
 
